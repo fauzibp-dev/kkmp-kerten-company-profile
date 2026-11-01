@@ -26,33 +26,64 @@ alter table public.gallery_items enable row level security;
 alter table public.team_members enable row level security;
 alter table public.testimonials enable row level security;
 drop policy if exists "Admin can read own KKMP access" on public.admin_users;
-create policy "Admin can read own KKMP access" on public.admin_users for select to authenticated using((select auth.uid())=user_id or (select private.is_kkmp_admin()));
 drop policy if exists "KKMP admins manage admin access" on public.admin_users;
-create policy "KKMP admins manage admin access" on public.admin_users for all to authenticated using((select private.is_kkmp_admin())) with check((select private.is_kkmp_admin()));
+create policy "Admin can read own KKMP access" on public.admin_users for select to authenticated
+using ((select auth.uid())=user_id or (select private.is_kkmp_admin()));
+create policy "KKMP admins insert admin access" on public.admin_users for insert to authenticated
+with check ((select private.is_kkmp_admin()));
+create policy "KKMP admins update admin access" on public.admin_users for update to authenticated
+using ((select private.is_kkmp_admin())) with check ((select private.is_kkmp_admin()));
+create policy "KKMP admins delete admin access" on public.admin_users for delete to authenticated
+using ((select private.is_kkmp_admin()));
+
 drop policy if exists "Public can read site content" on public.site_content;
-create policy "Public can read site content" on public.site_content for select to anon,authenticated using(true);
 drop policy if exists "KKMP admins manage site content" on public.site_content;
-create policy "KKMP admins manage site content" on public.site_content for all to authenticated using((select private.is_kkmp_admin())) with check((select private.is_kkmp_admin()));
+create policy "Public can read site content" on public.site_content for select to anon using (true);
+create policy "Authenticated can read site content" on public.site_content for select to authenticated using (true);
+create policy "KKMP admins insert site content" on public.site_content for insert to authenticated with check ((select private.is_kkmp_admin()));
+create policy "KKMP admins update site content" on public.site_content for update to authenticated using ((select private.is_kkmp_admin())) with check ((select private.is_kkmp_admin()));
+create policy "KKMP admins delete site content" on public.site_content for delete to authenticated using ((select private.is_kkmp_admin()));
+
 drop policy if exists "Public can read published business units" on public.business_units;
-create policy "Public can read published business units" on public.business_units for select to anon,authenticated using(is_published=true);
 drop policy if exists "KKMP admins manage business units" on public.business_units;
-create policy "KKMP admins manage business units" on public.business_units for all to authenticated using((select private.is_kkmp_admin())) with check((select private.is_kkmp_admin()));
+create policy "Public can read published business units" on public.business_units for select to anon using (is_published=true);
+create policy "Authenticated can read business units" on public.business_units for select to authenticated using (is_published=true or (select private.is_kkmp_admin()));
+create policy "KKMP admins insert business units" on public.business_units for insert to authenticated with check ((select private.is_kkmp_admin()));
+create policy "KKMP admins update business units" on public.business_units for update to authenticated using ((select private.is_kkmp_admin())) with check ((select private.is_kkmp_admin()));
+create policy "KKMP admins delete business units" on public.business_units for delete to authenticated using ((select private.is_kkmp_admin()));
+
 drop policy if exists "Public can read published timeline" on public.timeline_items;
-create policy "Public can read published timeline" on public.timeline_items for select to anon,authenticated using(is_published=true);
 drop policy if exists "KKMP admins manage timeline" on public.timeline_items;
-create policy "KKMP admins manage timeline" on public.timeline_items for all to authenticated using((select private.is_kkmp_admin())) with check((select private.is_kkmp_admin()));
+create policy "Public can read published timeline" on public.timeline_items for select to anon using (is_published=true);
+create policy "Authenticated can read timeline" on public.timeline_items for select to authenticated using (is_published=true or (select private.is_kkmp_admin()));
+create policy "KKMP admins insert timeline" on public.timeline_items for insert to authenticated with check ((select private.is_kkmp_admin()));
+create policy "KKMP admins update timeline" on public.timeline_items for update to authenticated using ((select private.is_kkmp_admin())) with check ((select private.is_kkmp_admin()));
+create policy "KKMP admins delete timeline" on public.timeline_items for delete to authenticated using ((select private.is_kkmp_admin()));
+
 drop policy if exists "Public can read published gallery" on public.gallery_items;
-create policy "Public can read published gallery" on public.gallery_items for select to anon,authenticated using(is_published=true);
 drop policy if exists "KKMP admins manage gallery" on public.gallery_items;
-create policy "KKMP admins manage gallery" on public.gallery_items for all to authenticated using((select private.is_kkmp_admin())) with check((select private.is_kkmp_admin()));
+create policy "Public can read published gallery" on public.gallery_items for select to anon using (is_published=true);
+create policy "Authenticated can read gallery" on public.gallery_items for select to authenticated using (is_published=true or (select private.is_kkmp_admin()));
+create policy "KKMP admins insert gallery" on public.gallery_items for insert to authenticated with check ((select private.is_kkmp_admin()));
+create policy "KKMP admins update gallery" on public.gallery_items for update to authenticated using ((select private.is_kkmp_admin())) with check ((select private.is_kkmp_admin()));
+create policy "KKMP admins delete gallery" on public.gallery_items for delete to authenticated using ((select private.is_kkmp_admin()));
+
 drop policy if exists "Public can read published team" on public.team_members;
-create policy "Public can read published team" on public.team_members for select to anon,authenticated using(is_published=true);
 drop policy if exists "KKMP admins manage team" on public.team_members;
-create policy "KKMP admins manage team" on public.team_members for all to authenticated using((select private.is_kkmp_admin())) with check((select private.is_kkmp_admin()));
+create policy "Public can read published team" on public.team_members for select to anon using (is_published=true);
+create policy "Authenticated can read team" on public.team_members for select to authenticated using (is_published=true or (select private.is_kkmp_admin()));
+create policy "KKMP admins insert team" on public.team_members for insert to authenticated with check ((select private.is_kkmp_admin()));
+create policy "KKMP admins update team" on public.team_members for update to authenticated using ((select private.is_kkmp_admin())) with check ((select private.is_kkmp_admin()));
+create policy "KKMP admins delete team" on public.team_members for delete to authenticated using ((select private.is_kkmp_admin()));
+
 drop policy if exists "Public can read published testimonials" on public.testimonials;
-create policy "Public can read published testimonials" on public.testimonials for select to anon,authenticated using(is_published=true);
 drop policy if exists "KKMP admins manage testimonials" on public.testimonials;
-create policy "KKMP admins manage testimonials" on public.testimonials for all to authenticated using((select private.is_kkmp_admin())) with check((select private.is_kkmp_admin()));
+create policy "Public can read published testimonials" on public.testimonials for select to anon using (is_published=true);
+create policy "Authenticated can read testimonials" on public.testimonials for select to authenticated using (is_published=true or (select private.is_kkmp_admin()));
+create policy "KKMP admins insert testimonials" on public.testimonials for insert to authenticated with check ((select private.is_kkmp_admin()));
+create policy "KKMP admins update testimonials" on public.testimonials for update to authenticated using ((select private.is_kkmp_admin())) with check ((select private.is_kkmp_admin()));
+create policy "KKMP admins delete testimonials" on public.testimonials for delete to authenticated using ((select private.is_kkmp_admin()));
+
 grant usage on schema public to anon,authenticated;
 grant select on public.site_content,public.business_units,public.timeline_items,public.gallery_items,public.team_members,public.testimonials to anon,authenticated;
 grant select,insert,update,delete on public.admin_users,public.site_content,public.business_units,public.timeline_items,public.gallery_items,public.team_members,public.testimonials to authenticated;
